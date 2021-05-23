@@ -21,7 +21,7 @@ var player = {
   x2: function(){return this.x + this.width;},
   y2: function(){return this.y + this.height;},
   friction: 0.9,
-  speed: 0.3
+  speed: 0.5
 };
 
 var box = {
@@ -33,7 +33,7 @@ var box = {
   width: 40,
   x2: function(){return this.x + this.width;},
   y2: function(){return this.y + this.height;},
-  friction: 0.9
+  friction: 0.98
 }
 
 controller = {
@@ -65,9 +65,6 @@ var loop = function(){
   
   handleMovement();
   handleBoxCollision(player);
-  
-  handleScreenEdge(player);
-  handleScreenEdge(box);
   drawScreen();
 
   
@@ -90,18 +87,20 @@ var handleMovement = function(){
 
   player.y += player.yv;
   player.x += player.xv;
+
+  handleScreenEdge(player);
 }
 
 var handleBoxCollision = function(thing){
 
-  if(thing.x < box.x2() && thing.x2() > box.x && thing.y <= box.y2() && thing.y2() >= box.y){
+  if(thing.x < box.x2() && thing.x2() > box.x && thing.y < box.y2() && thing.y2() > box.y){
         
-    let diffx = thing.x - box.x2();
-    let diffx2 = thing.x2() - box.x;
-    let diffy = thing.y - box.y2();
-    let diffy2 = thing.y2() - box.y;
-    let hori = Math.min(Math.abs(diffx), Math.abs(diffx2));
-    let vert = Math.min(Math.abs(diffy), Math.abs(diffy2));
+    let diffx = Math.abs(thing.x - box.x2());
+    let diffx2 = Math.abs(thing.x2() - box.x);
+    let diffy = Math.abs(thing.y - box.y2());
+    let diffy2 = Math.abs(thing.y2() - box.y);
+    let hori = Math.min(diffx, diffx2);
+    let vert = Math.min(diffy, diffy2);
 
     if (hori < vert) {
       box.xv = thing.xv;
@@ -112,6 +111,50 @@ var handleBoxCollision = function(thing){
   
   box.y += box.yv;
   box.x += box.xv;
+  handleScreenEdge(box);
+
+  if(thing.x < box.x2() && thing.x2() > box.x && thing.y < box.y2() && thing.y2() > box.y){
+        
+    let diffx = Math.abs(thing.x - box.x2());
+    let diffx2 = Math.abs(thing.x2() - box.x);
+    let diffy = Math.abs(thing.y - box.y2());
+    let diffy2 = Math.abs(thing.y2() - box.y);
+    let min = Math.min(diffx, diffx2, diffy, diffy2);
+
+    if(min == diffy){
+      if(thing.yv >= -0.5) {
+        thing.y = box.y2();
+        thing.yv = 0;
+      } else {
+        thing.y -= thing.yv;
+        thing.yv *= -thing.friction;
+      }
+    } else if(min == diffy2){
+      if(thing.yv <= 0.5) {
+        thing.y = box.y - thing.height;
+        thing.yv = 0;
+      } else {
+        thing.y -= thing.yv;
+        thing.yv *= -thing.friction;
+      }
+    } else if(min == diffx){
+      if(thing.xv >= -0.5) {
+        thing.x = box.x2();
+        thing.xv = 0;
+      } else {
+        thing.x -= thing.xv;
+        thing.xv *= -thing.friction;
+      }
+    } else if(min == diffx2){
+      if(thing.xv <= 0.5) {
+        thing.x = box.x - thing.width;
+        thing.xv = 0;
+      } else {
+        thing.x -= thing.xv;
+        thing.xv *= -thing.friction;
+      }
+    }
+  }
 }
 
 var handleScreenEdge = function(thing){
