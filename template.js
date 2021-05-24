@@ -1,7 +1,7 @@
 
-var context = document.querySelector("canvas").getContext("2d");
+let context = document.querySelector("canvas").getContext("2d");
 
-var screen = {
+let screen = {
   width: 1400,
   height: 900
 }
@@ -9,13 +9,13 @@ var screen = {
 context.canvas.width = screen.width;
 context.canvas.height = screen.height;
 
-var controller = {
+let controller = {
   up: false,
   left: false,
   right: false,
   down: false,
   keyListener: function(event) {
-    var key_state = (event.type == "keydown")?true:false;
+    let key_state = (event.type == "keydown")?true:false;
     switch(event.keyCode) {
       case 37:
         controller.left = key_state;
@@ -33,7 +33,7 @@ var controller = {
   }
 };
 
-var loop = function(){
+let loop = function(){
   drawScreen();
   // setTimeout(function(){window.requestAnimationFrame(loop);}, 1000/20)
   window.requestAnimationFrame(loop);
@@ -41,7 +41,7 @@ var loop = function(){
 
 
 
-var drawScreen = function(){
+let drawScreen = function(){
   
   context.fillStyle = "black";
   context.fillRect(0, 0, screen.width, screen.height);
